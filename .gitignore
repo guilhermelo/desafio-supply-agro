@@ -32,6 +32,6 @@ build/
 ### VS Code ###
 .vscode/
 
-./mvn
+.mvn/
 mvnw
 .flattened-pom.xml
