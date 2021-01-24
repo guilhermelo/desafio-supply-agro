@@ -6,7 +6,6 @@ import melo.rodrigues.guilherme.desafiosupplyagro.fazenda.dominio.Endereco;
 import melo.rodrigues.guilherme.desafiosupplyagro.fazenda.dominio.Fazenda;
 import melo.rodrigues.guilherme.desafiosupplyagro.fazenda.dominio.FazendaRepository;
 import org.hamcrest.Matchers;
-import org.junit.Assert;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -17,8 +16,6 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.MvcResult;
-import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -63,8 +60,8 @@ class FazendaControllerTest {
 
 
         MockHttpServletRequestBuilder post = post(URI).locale(new Locale("pt", "BR"))
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(mapper.writeValueAsString(request));
+                                                      .contentType(MediaType.APPLICATION_JSON)
+                                                      .content(mapper.writeValueAsString(request));
 
         mockMvc.perform(post).andExpect(status().isCreated());
     }
@@ -109,7 +106,7 @@ class FazendaControllerTest {
         MockHttpServletRequestBuilder delete = delete(uri).locale(new Locale("pt", "BR"))
                                                           .contentType(MediaType.APPLICATION_JSON);
 
-        mockMvc.perform(delete).andExpect(status().isOk());
+        mockMvc.perform(delete).andExpect(status().isNoContent());
 
         Optional<Fazenda> fazendaBuscada = repository.findById(fazenda.getId());
         Assertions.assertTrue(fazendaBuscada.isEmpty());
@@ -148,7 +145,7 @@ class FazendaControllerTest {
         Fazenda fazendaUm = Fazenda.comNomeCNPJEndereco("Fazenda 1", "69.096.927/0001-73", endereco);
 
         Endereco enderecoDois = Endereco.comCidadeEstadoLogradouro("Assis", "SP", "Rua 2");
-        Fazenda fazendaDois = Fazenda.comNomeCNPJEndereco("Fazenda 2", "83.694.908/0001-70", endereco);
+        Fazenda fazendaDois = Fazenda.comNomeCNPJEndereco("Fazenda 2", "83.694.908/0001-70", enderecoDois);
 
         repository.saveAll(Arrays.asList(fazendaUm, fazendaDois));
 

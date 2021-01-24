@@ -7,7 +7,6 @@ import com.totvs.tjf.api.context.v2.request.ApiSortRequest;
 import com.totvs.tjf.api.context.v2.response.ApiCollectionResponse;
 import com.totvs.tjf.core.api.jpa.repository.ApiJpaCollectionResult;
 import lombok.AllArgsConstructor;
-import lombok.Getter;
 import melo.rodrigues.guilherme.desafiosupplyagro.fazenda.api.exceptions.FazendaNaoEncontradaException;
 import melo.rodrigues.guilherme.desafiosupplyagro.fazenda.dominio.Fazenda;
 import melo.rodrigues.guilherme.desafiosupplyagro.fazenda.dominio.FazendaRepository;
@@ -42,7 +41,7 @@ public class FazendaController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<FazendaDTO> alterarFazenda(@PathVariable("id") String id, @Valid @RequestBody EdicaoFazendaRequest request) {
+    public ResponseEntity<FazendaDTO> alterar(@PathVariable("id") String id, @Valid @RequestBody EdicaoFazendaRequest request) {
 
         Fazenda fazenda = repository.findById(UUID.fromString(id))
                                     .orElseThrow(() -> new FazendaNaoEncontradaException(id));
@@ -63,20 +62,18 @@ public class FazendaController {
 
     @GetMapping("/{id}")
     public ResponseEntity<FazendaDTO> buscaPorId(@PathVariable("id") String id) {
-
-        Fazenda fazenda = repository.findById(UUID.fromString(id))
-                                    .orElseThrow(() -> new FazendaNaoEncontradaException(id));
-
-        return ResponseEntity.ok(FazendaDTO.from(fazenda));
+        return repository.findById(UUID.fromString(id))
+                         .map(f -> ResponseEntity.ok(FazendaDTO.from(f)))
+                         .orElseGet(() -> ResponseEntity.notFound().build());
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<UUID> excluirPorId(@PathVariable("id") String id) {
+    public ResponseEntity<Void> excluirPorId(@PathVariable("id") String id) {
         Fazenda fazenda = repository.findById(UUID.fromString(id))
                                     .orElseThrow(() -> new FazendaNaoEncontradaException(id));
 
         repository.deleteById(fazenda.getId());
 
-        return ResponseEntity.ok(fazenda.getId());
+        return ResponseEntity.noContent().build();
     }
 }

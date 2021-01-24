@@ -11,7 +11,7 @@ import java.util.UUID;
 @Getter
 @Entity
 @NoArgsConstructor(access = AccessLevel.PACKAGE)
-@AllArgsConstructor
+@AllArgsConstructor(access = AccessLevel.PRIVATE)
 public class Fazenda {
 
     @Id
@@ -37,7 +37,7 @@ public class Fazenda {
     }
 
     public Fazenda atualizaNome(@NonNull String nome) {
-        return Fazenda.comNomeCNPJEndereco(nome, cnpj, endereco);
+        return new Fazenda(id, nome, cnpj, endereco);
     }
 
     public static Fazenda comNomeCNPJEndereco(String nome, String cnpj, Endereco endereco) {
