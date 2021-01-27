@@ -99,31 +99,6 @@ class ColheitaControllerTest {
     }
 
     @Test
-    @DisplayName("Deve retornar relatório com a soma das sacas colhidas por fazenda")
-    void deveRetornarRelatorioSomaSacasColhidas() throws Exception {
-        MockHttpServletRequestBuilder get = get(API + "/relatorio/soma/sacasColhidas").locale(new Locale("pt", "BR"))
-                .contentType(MediaType.APPLICATION_JSON);
-
-        MvcResult resultado = mockMvc.perform(get)
-                                     .andExpect(status().isOk())
-                                     .andReturn();
-
-        String json = resultado.getResponse().getContentAsString();
-        List<RelatorioSomaSacasColhidas> relatorio = mapper.readValue(json, new TypeReference<>() {});
-
-        Assertions.assertEquals(3, relatorio.size());
-
-        Assertions.assertEquals("Fazenda 1", relatorio.get(0).getFazenda());
-        Assertions.assertEquals(new BigDecimal("23.22"), relatorio.get(0).getSacasColhidas());
-
-        Assertions.assertEquals("Fazenda 2", relatorio.get(1).getFazenda());
-        Assertions.assertEquals(new BigDecimal("11.75"), relatorio.get(1).getSacasColhidas());
-
-        Assertions.assertEquals("Fazenda 3", relatorio.get(2).getFazenda());
-        Assertions.assertEquals(new BigDecimal("15.83"), relatorio.get(2).getSacasColhidas());
-    }
-
-    @Test
     @DisplayName("Deve retornar relatório com a soma das sacas colhidas por fazenda com filtro por data")
     void deveRetornarRelatorioSomaSacasColhidasComFiltroPorData() throws Exception {
 

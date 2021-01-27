@@ -9,12 +9,9 @@ import lombok.AllArgsConstructor;
 import melo.rodrigues.guilherme.desafiosupplyagro.plantio.dominio.Plantio;
 import melo.rodrigues.guilherme.desafiosupplyagro.plantio.dominio.PlantioRepository;
 import melo.rodrigues.guilherme.desafiosupplyagro.plantio.dominio.RelatorioSomaAreaPlantada;
-import melo.rodrigues.guilherme.desafiosupplyagro.plantio.infra.RelatorioPlantioRepository;
 import melo.rodrigues.guilherme.desafiosupplyagro.talhao.api.exceptions.TalhaoNaoEncontradoException;
-import melo.rodrigues.guilherme.desafiosupplyagro.talhao.dominio.EventoRepository;
 import melo.rodrigues.guilherme.desafiosupplyagro.talhao.dominio.Talhao;
 import melo.rodrigues.guilherme.desafiosupplyagro.talhao.dominio.TalhaoRepository;
-import melo.rodrigues.guilherme.desafiosupplyagro.talhao.dominio.TipoEvento;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
@@ -31,9 +28,7 @@ import java.util.UUID;
 public class PlantioController {
 
     private final TalhaoRepository talhaoRepository;
-    private final EventoRepository eventoRepository;
     private final PlantioRepository plantioRepository;
-    private final RelatorioPlantioRepository relatorioPlantioRepository;
 
     @PostMapping
     @ApiOperation("Realiza um novo apontamento de plantio")
@@ -55,7 +50,7 @@ public class PlantioController {
     @ApiOperation("Busca todos os apontamentos de plantios")
     public ApiCollectionResponse<EventoProjecao> buscarTodos(ApiPageRequest pageRequest) {
         Pageable paginacao = ApiRequestConverter.convert(pageRequest);
-        Page<EventoProjecao> resultado = eventoRepository.selecionaComProjecaoPorTipo(paginacao, TipoEvento.PLANTIO);
+        Page<EventoProjecao> resultado = plantioRepository.selecionaResumido(paginacao);
 
         return ApiCollectionResponse.of(resultado.toList(), resultado.hasNext());
     }
@@ -71,7 +66,7 @@ public class PlantioController {
     @GetMapping("/relatorio/soma/area")
     @ApiOperation("Retorna uma visão da soma da área plantada por fazenda e variedade")
     public ResponseEntity<List<RelatorioSomaAreaPlantada>> relatorio(Filtro filtro) {
-        List<RelatorioSomaAreaPlantada> relatorio = relatorioPlantioRepository.buscaSomaAreaPlantadaPorFazendaVariedade(filtro);
+        List<RelatorioSomaAreaPlantada> relatorio = plantioRepository.relatorioSomaAreaPlantada(filtro.getDataInicial(), filtro.getDataFinal());
 
         return ResponseEntity.ok(relatorio);
     }

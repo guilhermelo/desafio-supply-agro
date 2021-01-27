@@ -14,6 +14,7 @@ import melo.rodrigues.guilherme.desafiosupplyagro.fazenda.dominio.FazendaReposit
 import melo.rodrigues.guilherme.desafiosupplyagro.talhao.api.exceptions.OperacaoInvalidaException;
 import melo.rodrigues.guilherme.desafiosupplyagro.talhao.api.exceptions.TalhaoComCodigoFazendaException;
 import melo.rodrigues.guilherme.desafiosupplyagro.talhao.api.exceptions.TalhaoNaoEncontradoException;
+import melo.rodrigues.guilherme.desafiosupplyagro.talhao.dominio.EncerrarTalhoes;
 import melo.rodrigues.guilherme.desafiosupplyagro.talhao.dominio.EventoRepository;
 import melo.rodrigues.guilherme.desafiosupplyagro.talhao.dominio.Talhao;
 import melo.rodrigues.guilherme.desafiosupplyagro.talhao.dominio.TalhaoRepository;
@@ -23,7 +24,6 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import javax.validation.Valid;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -37,6 +37,7 @@ public class TalhaoController {
     private final FazendaRepository fazendaRepository;
     private final TalhaoRepository talhaoRepository;
     private final EventoRepository eventoRepository;
+    private final EncerrarTalhoes encerrarTalhoes;
 
     @PostMapping
     @ApiOperation("Insere um novo talhão")
@@ -119,20 +120,10 @@ public class TalhaoController {
     @Transactional(rollbackFor = OperacaoInvalidaException.class)
     public ResponseEntity<List<TalhaoDTO>> encerraTalhao(@PathVariable("safra") Integer safra) {
 
-        List<Talhao> talhoes = talhaoRepository.findBySafra(safra);
-
-        List<Talhao> talhoesProximaSafra = new ArrayList<>();
-
-        for (Talhao talhao : talhoes) {
-            talhao.encerrar();
-
-            Talhao talhaoParaProximaSafra = talhao.geraTalhaoParaProximaSafra();
-
-            talhoesProximaSafra.add(talhaoParaProximaSafra);
-        }
-
-        talhaoRepository.saveAll(talhoesProximaSafra);
+        List<Talhao> talhoesProximaSafra = encerrarTalhoes.executar(safra);
 
         return ResponseEntity.ok(talhoesProximaSafra.stream().map(TalhaoDTO::from).collect(Collectors.toList()));
     }
+
+
 }

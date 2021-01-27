@@ -5,17 +5,16 @@ import com.totvs.tjf.api.context.v2.request.ApiFieldRequest;
 import com.totvs.tjf.api.context.v2.request.ApiPageRequest;
 import com.totvs.tjf.api.context.v2.response.ApiCollectionResponse;
 import com.totvs.tjf.api.jpa.ApiRequestConverter;
-import com.totvs.tjf.core.api.jpa.repository.ApiJpaCollectionResult;
 import io.swagger.annotations.ApiOperation;
 import lombok.AllArgsConstructor;
 import melo.rodrigues.guilherme.desafiosupplyagro.colheita.dominio.Colheita;
 import melo.rodrigues.guilherme.desafiosupplyagro.colheita.dominio.ColheitaRepository;
 import melo.rodrigues.guilherme.desafiosupplyagro.colheita.dominio.RelatorioSomaSacasColhidas;
-import melo.rodrigues.guilherme.desafiosupplyagro.colheita.infra.RelatorioColheitaRepository;
 import melo.rodrigues.guilherme.desafiosupplyagro.plantio.api.EventoProjecao;
 import melo.rodrigues.guilherme.desafiosupplyagro.plantio.api.Filtro;
 import melo.rodrigues.guilherme.desafiosupplyagro.talhao.api.exceptions.TalhaoNaoEncontradoException;
-import melo.rodrigues.guilherme.desafiosupplyagro.talhao.dominio.*;
+import melo.rodrigues.guilherme.desafiosupplyagro.talhao.dominio.Talhao;
+import melo.rodrigues.guilherme.desafiosupplyagro.talhao.dominio.TalhaoRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
@@ -34,9 +33,7 @@ import java.util.stream.Collectors;
 public class ColheitaController {
 
     private final TalhaoRepository talhaoRepository;
-    private final EventoRepository eventoRepository;
     private final ColheitaRepository colheitaRepository;
-    private final RelatorioColheitaRepository relatorioColheitaRepository;
 
     @PostMapping
     @ApiOperation("Realiza um apontamento de colheita")
@@ -66,9 +63,10 @@ public class ColheitaController {
     @ApiOperation("Busca todas as colheitas com paginação")
     public ApiCollectionResponse<ColheitaDTO> buscaTodosPaginados(ApiFieldRequest apiFieldRequest, ApiPageRequest pageRequest) {
 
-        ApiJpaCollectionResult<Colheita> resultado = colheitaRepository.findAllProjected(apiFieldRequest, pageRequest);
+        Pageable paginacao = ApiRequestConverter.convert(pageRequest);
+        Page<Colheita> resultado = colheitaRepository.fetchAll(paginacao);
 
-        List<ColheitaDTO> colheitas = resultado.getItems().stream().map(ColheitaDTO::from).collect(Collectors.toList());
+        List<ColheitaDTO> colheitas = resultado.getContent().stream().map(ColheitaDTO::from).collect(Collectors.toList());
 
         return ApiCollectionResponse.of(colheitas, resultado.hasNext());
     }
@@ -77,7 +75,7 @@ public class ColheitaController {
     @ApiOperation("Busca colheitas de forma resumida")
     public ApiCollectionResponse<EventoProjecao> buscaComProjecaoPaginadas(ApiPageRequest pageRequest) {
         Pageable paginacao = ApiRequestConverter.convert(pageRequest);
-        Page<EventoProjecao> resultado = eventoRepository.selecionaComProjecaoPorTipo(paginacao, TipoEvento.COLHEITA);
+        Page<EventoProjecao> resultado = colheitaRepository.selecionaResumido(paginacao);
 
         return ApiCollectionResponse.of(resultado.toList(), resultado.hasNext());
     }
@@ -85,7 +83,8 @@ public class ColheitaController {
     @GetMapping("/relatorio/soma/sacasColhidas")
     @ApiOperation("Retorna uma visão da soma de sacas colhidas por fazenda")
     public ResponseEntity<List<RelatorioSomaSacasColhidas>> relatorio(Filtro filtro) {
-        List<RelatorioSomaSacasColhidas> relatorio = relatorioColheitaRepository.buscaSomaSacasPorFazenda(filtro);
+
+        List<RelatorioSomaSacasColhidas> relatorio = colheitaRepository.relatorioSomaSacasColhidas(filtro.getDataInicial(), filtro.getDataFinal());
 
         return ResponseEntity.ok(relatorio);
     }

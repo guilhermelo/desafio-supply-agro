@@ -90,39 +90,6 @@ class PlantioControllerTest {
 
     @Test
     @DisplayName("Deve retornar um relatório da soma da área plantada por fazenda e variedade")
-    void deveRetornarRelatorioSomaSacasColhidas() throws Exception {
-        MockHttpServletRequestBuilder get = get(API + "/relatorio/soma/area").locale(new Locale("pt", "BR"))
-                .contentType(MediaType.APPLICATION_JSON);
-
-        MvcResult resultado = mockMvc.perform(get)
-                .andExpect(status().isOk())
-                .andReturn();
-
-        String json = resultado.getResponse().getContentAsString();
-        List<RelatorioSomaAreaPlantada> relatorio = mapper.readValue(json, new TypeReference<>() {});
-
-        Assertions.assertEquals(4, relatorio.size());
-
-        Assertions.assertEquals("Fazenda 1", relatorio.get(0).getFazenda());
-        Assertions.assertEquals("Milho", relatorio.get(0).getVariedade());
-        Assertions.assertEquals(new BigDecimal("195.00"), relatorio.get(0).getSomaAreaPlantada());
-
-        Assertions.assertEquals("Fazenda 1", relatorio.get(1).getFazenda());
-        Assertions.assertEquals("Soja", relatorio.get(1).getVariedade());
-        Assertions.assertEquals(new BigDecimal("95.00"), relatorio.get(1).getSomaAreaPlantada());
-
-        Assertions.assertEquals("Fazenda 2", relatorio.get(2).getFazenda());
-        Assertions.assertEquals("Milho", relatorio.get(2).getVariedade());
-        Assertions.assertEquals(new BigDecimal("115.00"), relatorio.get(2).getSomaAreaPlantada());
-
-        Assertions.assertEquals("Fazenda 3", relatorio.get(3).getFazenda());
-        Assertions.assertEquals("Feijao", relatorio.get(3).getVariedade());
-        Assertions.assertEquals(new BigDecimal("300.00"), relatorio.get(3).getSomaAreaPlantada());
-
-    }
-
-    @Test
-    @DisplayName("Deve retornar um relatório da soma da área plantada por fazenda e variedade")
     void deveRetornarRelatorioSomaSacasColhidasComFiltroPorData() throws Exception {
 
         LocalDateTime localDateTime = LocalDateTime.of(2020, Month.JUNE, 19, 8, 30, 0);

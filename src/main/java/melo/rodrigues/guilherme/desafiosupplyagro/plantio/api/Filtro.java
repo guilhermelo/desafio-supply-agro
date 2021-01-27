@@ -4,7 +4,6 @@ import lombok.RequiredArgsConstructor;
 
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.Objects;
 
 @RequiredArgsConstructor
 public class Filtro {
@@ -19,10 +18,6 @@ public class Filtro {
 
     public ZonedDateTime getDataFinal() {
         return ZonedDateTime.parse(dataFinal, formatter);
-    }
-
-    public boolean isDatasInformadas() {
-        return Objects.nonNull(dataInicial) && Objects.nonNull(dataFinal);
     }
 }
 
