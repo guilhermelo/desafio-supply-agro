@@ -17,6 +17,7 @@ public class EventoDTO {
     private final TipoEvento tipo;
     private final TalhaoDTO talhao;
 
+
     public static EventoDTO from(Evento evento) {
         return new EventoDTO(evento.getData(), evento.getAreaEmHectare(), evento.getTipo(), TalhaoDTO.from(evento.getTalhao()));
     }
